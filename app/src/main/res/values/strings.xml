@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">VeroLocator</string>
+    <string name="send_position">Enviar posición</string>
+    <string name="gps_unavailable">GPS no disponible</string>
+    <string name="searching_position">Buscando posición</string>
+    <string name="latitude_and_longitude">Latitud %1$s / Longitud %2$s</string>
+</resources>
