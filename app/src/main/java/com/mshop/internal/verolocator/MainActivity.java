@@ -35,6 +35,7 @@ import static android.provider.Settings.Secure.ANDROID_ID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, LocationListener, PositionPresenter.PositionView {
     private static final int PERMISSION_REQUEST_PHONE_STATE = 1000;
+    private static final int UPDATING_PERIOD = 60000;
 
 
     private TextView txtPosition;
@@ -91,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v == btnSendPosition) {
 
             if (sendingPosition) {
-                handlerRefreshPosition.post(runUpdatePosition);
-            } else {
                 handlerRefreshPosition.removeCallbacks(runUpdatePosition);
+                btnSendPosition.setText(getString(R.string.send_position));
+            } else {
+                handlerRefreshPosition.post(runUpdatePosition);
+                btnSendPosition.setText(getString(R.string.updating_position));
             }
 
             sendingPosition = !sendingPosition;
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        String position = String.format(getString(R.string.latitude_and_longitude), latitude, longitude);
+        String position = String.format(getString(R.string.latitude_and_longitude), String.valueOf(latitude), String.valueOf(longitude));
         txtPosition.setText(position);
     }
 
@@ -136,16 +139,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // ------------------------------------------------------------ POSITION VIEW INTERFACE --------------------------------------------------
     @Override
     public void onPositionUpdated(BasicResponseDto any) {
-        handlerRefreshPosition.postDelayed(runUpdatePosition, 60000);
+        System.out.println("onPositionUpdated! :: " + any.getCode());
     }
 
     @Override
     public void onPositionServerError(MessageCode any) {
+        System.out.println("onPositionServerError! :: " + any.getCode());
         Toast.makeText(this, any.getCode(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPositionError(Throwable e) {
+        System.out.println("onPositionError! :: " + e.getMessage());
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
@@ -181,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             RefreshLocationBody body = new RefreshLocationBody(0, ANDROID_ID, 100, latitude, longitude);
             positionPresenter.callToRefreshLocation(body);
-            handlerRefreshPosition.postDelayed(this, 60000);
+            handlerRefreshPosition.postDelayed(this, UPDATING_PERIOD);
         }
     }
 }

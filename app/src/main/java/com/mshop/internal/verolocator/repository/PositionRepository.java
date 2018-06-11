@@ -16,6 +16,7 @@ import retrofit2.http.POST;
 public interface PositionRepository {
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
 
+//    @POST("/AppJulianes/GpsLocalizacion/getUbicacion")
     @POST("/setex/services/userApp/refreshLocation")
     Observable<BasicResponseDto> getData(@Body RefreshLocationBody body);
 }
